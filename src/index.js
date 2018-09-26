@@ -34,7 +34,9 @@ export default class QRCode extends PureComponent {
     /* get svg ref for further usage */
     getRef: PropTypes.func,
     /* error correction level */
-    ecl: PropTypes.oneOf(['L', 'M', 'Q', 'H'])
+    ecl: PropTypes.oneOf(['L', 'M', 'Q', 'H']),
+    /* other qr code options */
+    qrOptions: PropTypes.object
   };
   static defaultProps = {
     value: 'This is a QR Code.',
@@ -45,7 +47,8 @@ export default class QRCode extends PureComponent {
     logoBackgroundColor: DEFAULT_BG_COLOR,
     logoMargin: 2,
     logoBorderRadius: 0,
-    ecl: 'M'
+    ecl: 'M',
+    qrOptions: {}
   };
   constructor (props) {
     super(props)
@@ -62,8 +65,14 @@ export default class QRCode extends PureComponent {
   }
   /* calculate the size of the cell and draw the path */
   setMatrix (props) {
-    const { value, size, ecl } = props
-    this._matrix = genMatrix(value, ecl)
+    const { value, size, ecl, qrOptions } = props
+    let amendedQROptions = {
+      ...qrOptions
+    }
+    if (ecl && !qrOptions.errorCorrectionLevel)
+      amendedQROptions.errorCorrectionLevel = ecl
+
+    this._matrix = genMatrix(value, amendedQROptions)
     this._cellSize = size / this._matrix.length
     this._path = this.transformMatrixIntoPath()
   }
